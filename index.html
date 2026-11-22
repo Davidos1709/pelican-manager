@@ -269,8 +269,21 @@
   </div>
 </dialog>
   <div class="toast" id="toast" role="status" hidden></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     (() => {
+      
+      const SUPABASE_URL =
+  'https://sqjbnwajykublszjmwfw.supabase.co';
+
+const SUPABASE_KEY =
+  'sb_publishable_UFPsrVsjjd0gWv6kQVWsLA_5a7UaaFV';
+
+const supabaseClient =
+  supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
       const STORAGE_KEY = 'pelican-equipment-manager-v1';
       const emptyState = () => ({ equipment: [], trip: { name: '', destination: '', date: '' }, pelicans: [], savedTrips: [] });
       let state = loadState();
