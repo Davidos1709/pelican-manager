@@ -293,8 +293,10 @@
       function renderDatabase() {
         const query = document.getElementById('db-search').value.trim().toLocaleLowerCase();
         const items = state.equipment.filter(item => [item.name, item.model, item.serial].some(value => String(value || '').toLocaleLowerCase().includes(query)));
-        document.getElementById('equipment-count').textContent = `${state.equipment.length} פריטים במאגר. המאגר נשמר במכשיר הזה וזמין בכל טיסה.`;
-        document.getElementById('equipment-table').innerHTML = items.map(item => `<tr><td><strong>${escapeHtml(item.name)}</strong></td><td>${escapeHtml(item.model || '—')}</td><td>${escapeHtml(item.serial || '—')}</td><td>${escapeHtml(item.defaultQuantity || 1)}</td><td><div class="table-actions"><button class="button secondary small" type="button" data-action="edit-equipment" data-id="${escapeHtml(item.id)}">עריכה</button><button class="button danger small" type="button" data-action="delete-equipment" data-id="${escapeHtml(item.id)}">מחיקה</button></div></td></tr>`).join('');
+document.getElementById('equipment-count').textContent =
+query
+  ? `${items.length} מתוך ${state.equipment.length} פריטים מוצגים`
+  : `${state.equipment.length} פריטים במאגר. המאגר נשמר במכשיר הזה וזמין בכל טיסה.`;        document.getElementById('equipment-table').innerHTML = items.map(item => `<tr><td><strong>${escapeHtml(item.name)}</strong></td><td>${escapeHtml(item.model || '—')}</td><td>${escapeHtml(item.serial || '—')}</td><td>${escapeHtml(item.defaultQuantity || 1)}</td><td><div class="table-actions"><button class="button secondary small" type="button" data-action="edit-equipment" data-id="${escapeHtml(item.id)}">עריכה</button><button class="button danger small" type="button" data-action="delete-equipment" data-id="${escapeHtml(item.id)}">מחיקה</button></div></td></tr>`).join('');
         const empty = document.getElementById('db-empty'); empty.hidden = items.length > 0;
         empty.textContent = state.equipment.length ? 'לא נמצאו פריטים מתאימים לחיפוש.' : 'המאגר עדיין ריק. הוסיפו ציוד כדי להשתמש בו בטיסות.';
       }
