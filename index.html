@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f5ef">
+  <title>מנהל ציוד | פליקנים</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172a27;
+      --muted: #64736d;
+      --line: #dce3db;
+      --paper: #fbfcf9;
+      --canvas: #f0f3ed;
+      --green: #245c4e;
+      --green-dark: #193f36;
+      --lime: #d8e6a8;
+      --coral: #c75c45;
+      --white: #fff;
+      --shadow: 0 12px 32px rgb(22 46 37 / 7%);
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background: var(--canvas);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: radial-gradient(ellipse at 92% 0%, #e5ebd9 0, transparent 34rem), var(--canvas); }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .shell { max-width: 1480px; margin: auto; padding: 28px clamp(16px, 3vw, 42px) 56px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 30px; }
+    .brand { display: flex; align-items: center; gap: 13px; }
+    .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; color: var(--lime); background: var(--green-dark); border-radius: 12px 12px 12px 4px; font-size: 19px; font-weight: 800; }
+    .brand strong { display: block; font-size: 16px; letter-spacing: 0; }
+    .brand small { display: block; color: var(--muted); margin-top: 3px; font-size: 12px; }
+    .nav { display: flex; gap: 5px; background: #e5eae2; padding: 5px; border-radius: 10px; }
+    .nav button { border: 0; color: #53645d; background: transparent; padding: 10px 17px; border-radius: 7px; font-weight: 650; }
+    .nav button[aria-current="page"] { color: var(--white); background: var(--green); box-shadow: 0 3px 8px #183f3630; }
+    .trip-panel { display: grid; grid-template-columns: minmax(210px, 1.5fr) minmax(160px, 1fr) minmax(160px, 1fr) auto; gap: 14px; align-items: end; padding: 18px; background: rgb(255 255 255 / 78%); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 27px; }
+    .field { display: grid; gap: 7px; min-width: 0; }
+    .field label { color: var(--muted); font-size: 12px; font-weight: 650; }
+    input, select { min-width: 0; width: 100%; padding: 10px 11px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: var(--white); outline: none; }
+    input:focus, select:focus { border-color: #4b806c; box-shadow: 0 0 0 3px #4b806c20; }
+    input::placeholder { color: #9aa59f; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 9px 14px; border: 1px solid transparent; border-radius: 7px; color: var(--white); background: var(--green); font-weight: 700; white-space: nowrap; }
+    .button:hover { background: var(--green-dark); }
+    .button.secondary { color: var(--green-dark); background: var(--white); border-color: var(--line); }
+    .button.secondary:hover { background: #f2f6ef; }
+    .button.danger { color: #a64333; background: #fff6f3; border-color: #f0d7d0; }
+    .button.small { min-height: 32px; padding: 6px 10px; font-size: 13px; }
+    .icon-button { width: 32px; height: 32px; padding: 0; display: inline-grid; place-items: center; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); background: var(--white); }
+    .icon-button:hover { color: var(--coral); border-color: #e7b9ae; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin: 0 0 16px; }
+    .section-heading h1 { margin: 0; font-size: clamp(22px, 3vw, 29px); letter-spacing: 0; }
+    .section-heading p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+    .heading-actions { display: flex; align-items: center; gap: 9px; }
+    .case-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; align-items: start; }
+    .case-card { min-width: 0; overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 5px 16px rgb(22 46 37 / 4%); animation: appear .28s ease both; }
+    @keyframes appear { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    .case-head { display: flex; justify-content: space-between; align-items: center; min-height: 56px; padding: 10px 14px; background: #e8eee5; border-bottom: 1px solid var(--line); }
+    .case-name { display: flex; align-items: center; gap: 9px; }
+    .case-name strong { font-size: 18px; }
+    .case-count { color: var(--muted); font-size: 12px; }
+    .case-tools { display: flex; gap: 6px; }
+    .case-body { padding: 7px 14px 12px; }
+    .equipment-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 12px 0; border-bottom: 1px solid #e8ece6; }
+    .equipment-row:last-of-type { border-bottom: 0; }
+    .row-info { min-width: 0; }
+    .row-info strong { display: block; overflow-wrap: anywhere; font-size: 14px; }
+    .row-info small { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+    .row-controls { display: flex; align-items: center; gap: 5px; }
+    .quantity { width: 47px; height: 31px; padding: 4px; text-align: center; font-weight: 700; border-radius: 5px; }
+    .stepper { width: 29px; height: 29px; border: 1px solid var(--line); border-radius: 5px; background: white; color: var(--green-dark); font-weight: 800; }
+    .stepper:hover { background: #e8eee5; }
+    .row-bottom { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: -3px; }
+    .move-select { width: auto; max-width: 150px; padding: 5px 7px; font-size: 12px; }
+    .text-button { padding: 5px 0; border: 0; color: var(--green); background: none; font-weight: 700; }
+    .text-button:hover { color: var(--green-dark); }
+    .empty-note { padding: 17px 0 19px; color: #84918a; text-align: center; font-size: 13px; }
+    .case-add { width: 100%; margin-top: 7px; border: 1px dashed #b7c5b9; border-radius: 6px; padding: 8px; color: var(--green); background: transparent; font-size: 13px; font-weight: 700; }
+    .case-add:hover { background: #f0f5ed; }
+    .empty-state { padding: 50px 20px; text-align: center; color: var(--muted); border: 1px dashed #bdc9bf; border-radius: 10px; background: rgb(255 255 255 / 45%); }
+    .empty-state strong { display: block; margin-bottom: 7px; color: var(--ink); font-size: 17px; }
+    .trip-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+    .trip-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); box-shadow: 0 5px 16px rgb(22 46 37 / 4%); }
+    .trip-card h2 { margin: 0; font-size: 17px; overflow-wrap: anywhere; }
+    .trip-card p { margin: 8px 0; color: var(--muted); font-size: 13px; }
+    .trip-card small { color: var(--muted); }
+    .trip-card-actions { display: flex; gap: 8px; margin-top: 14px; }
+    .database-tools { display: flex; gap: 8px; align-items: center; }
+    .search { max-width: 360px; }
+    .table-wrap { overflow-x: auto; background: var(--paper); border: 1px solid var(--line); border-radius: 10px; box-shadow: var(--shadow); }
+    table { width: 100%; border-collapse: collapse; text-align: right; }
+    th, td { padding: 14px 16px; border-bottom: 1px solid #e8ece6; }
+    th { color: var(--muted); background: #f3f6f1; font-size: 12px; font-weight: 700; }
+    td { font-size: 14px; }
+    tr:last-child td { border-bottom: 0; }
+    .table-actions { display: flex; gap: 6px; }
+    .no-results { padding: 38px; color: var(--muted); text-align: center; }
+    dialog { width: min(460px, calc(100vw - 28px)); max-height: min(85vh, 760px); padding: 0; border: 1px solid var(--line); border-radius: 12px; color: var(--ink); background: var(--paper); box-shadow: 0 24px 80px #10231e45; }
+    dialog::backdrop { background: #12231f70; backdrop-filter: blur(2px); }
+    .dialog-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 19px; border-bottom: 1px solid var(--line); }
+    .dialog-head h2 { margin: 0; font-size: 18px; }
+    .dialog-content { padding: 18px 19px 20px; }
+    .form-stack { display: grid; gap: 14px; }
+    .dialog-actions { display: flex; justify-content: flex-start; gap: 8px; margin-top: 20px; }
+    .selector-search { margin-bottom: 12px; }
+    .selector-list { max-height: 340px; overflow-y: auto; display: grid; gap: 7px; }
+    .selector-item { display: flex; width: 100%; justify-content: space-between; gap: 10px; padding: 11px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: white; text-align: right; }
+    .selector-item:hover { border-color: #8ca897; background: #f2f6ef; }
+    .selector-item strong { display: block; }
+    .selector-item small { display: block; margin-top: 4px; color: var(--muted); }
+    .selector-empty { padding: 20px 8px; color: var(--muted); text-align: center; font-size: 13px; }
+    .print-sheet { display: none; }
+    .toast { position: fixed; z-index: 20; bottom: 20px; right: 50%; transform: translateX(50%); padding: 10px 15px; border-radius: 7px; color: white; background: var(--green-dark); box-shadow: var(--shadow); font-size: 13px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 940px) { .case-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .trip-panel { grid-template-columns: repeat(2, minmax(0, 1fr)); } .trip-panel > .button { align-self: end; } }
+    @media (max-width: 580px) {
+      .shell { padding: 17px 13px 35px; }
+      .topbar { align-items: flex-start; flex-direction: column; margin-bottom: 19px; gap: 14px; }
+      .nav { width: 100%; }
+      .nav button { flex: 1; }
+      .trip-panel { grid-template-columns: 1fr 1fr; gap: 10px; padding: 13px; margin-bottom: 21px; }
+      .trip-panel .field:first-child { grid-column: 1 / -1; }
+      .trip-panel > .button { width: 100%; grid-column: 1 / -1; }
+      .section-heading { align-items: flex-start; flex-direction: column; }
+      .heading-actions { width: 100%; flex-wrap: wrap; }
+      .heading-actions .button { flex: 1; }
+      .case-grid { grid-template-columns: 1fr; gap: 11px; }
+      .trip-list { grid-template-columns: 1fr; }
+      .database-tools { width: 100%; flex-wrap: wrap; }
+      .search { max-width: none; flex: 1 1 100%; }
+      .table-wrap { margin-inline: -2px; }
+      th, td { padding: 11px 10px; white-space: nowrap; }
+      .row-controls { gap: 3px; }
+      .move-select { max-width: 125px; }
+    }
+    @media print {
+      @page { size: A4; margin: 16mm 14mm; }
+      body { min-width: 0; color: #111; background: white; }
+      .shell, dialog, .toast { display: none !important; }
+      .print-sheet { display: block !important; direction: rtl; color: #111; font-family: Arial, sans-serif; }
+      .print-header { padding-bottom: 12px; margin-bottom: 18px; border-bottom: 2px solid #234f42; }
+      .print-header h1 { margin: 0 0 10px; font-size: 22px; }
+      .print-meta { display: flex; flex-wrap: wrap; gap: 8px 24px; color: #444; font-size: 12px; }
+      .print-case { break-inside: avoid; margin: 0 0 18px; }
+      .print-case h2 { margin: 0 0 7px; padding: 7px 9px; border-right: 4px solid #245c4e; background: #edf2eb; font-size: 16px; }
+      .print-case ul { list-style: none; padding: 0; margin: 0; }
+      .print-case li { padding: 5px 10px; border-bottom: 1px solid #ddd; font-size: 12px; }
+      .print-empty { color: #555; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell" id="app">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">P</div><div><strong>מנהל ציוד</strong><small>אריזה חכמה לכל טיסה</small></div></div>
+      <nav class="nav" aria-label="ניווט ראשי">
+        <button type="button" data-view="cases" aria-current="page">הפליקנים</button>
+        <button type="button" data-view="saved-trips" aria-current="false">טיסות שמורות</button>
+        <button type="button" data-view="database">מאגר ציוד</button>
+      </nav>
+    </header>
+
+    <section class="trip-panel" aria-label="פרטי טיסה">
+      <div class="field"><label for="trip-name">שם הטיסה / פרויקט</label><input id="trip-name" data-trip="name" placeholder="לדוגמה: צילום תל אביב" autocomplete="off"></div>
+      <div class="field"><label for="trip-destination">יעד</label><input id="trip-destination" data-trip="destination" placeholder="יעד הטיסה" autocomplete="off"></div>
+      <div class="field"><label for="trip-date">תאריך</label><input id="trip-date" data-trip="date" type="date"></div>
+      <button class="button secondary" id="new-trip" type="button">טיסה חדשה</button>
+    </section>
+
+    <section id="cases-view">
+      <div class="section-heading">
+        <div><h1>הפליקנים</h1><p id="case-subtitle">כל הציוד לטיסה, מסודר לפי פליקן</p></div>
+        <div class="heading-actions"><button class="button secondary" id="full-list" type="button">☷ &nbsp;רשימה מלאה</button><button class="button" id="add-case" type="button">＋ &nbsp;הוסף פליקן</button></div>
+      </div>
+      <div id="case-grid" class="case-grid"></div>
+      <div id="case-empty" class="empty-state" hidden><strong>עוד אין פליקנים בטיסה</strong>הוסיפו פליקן כדי להתחיל לארוז את הציוד.</div>
+    </section>
+
+    <section id="saved-trips-view" hidden>
+      <div class="section-heading">
+        <div><h1>טיסות שמורות</h1><p>טיסות נשמרות בדפדפן ובמכשיר הזה בלבד.</p></div>
+      </div>
+      <div id="saved-trips-list" class="trip-list"></div>
+      <div id="saved-trips-empty" class="empty-state" hidden><strong>אין עדיין טיסות שמורות</strong>הטיסה הפעילה תישמר כאן כשתפתחו טיסה חדשה.</div>
+    </section>
+
+    <section id="database-view" hidden>
+      <div class="section-heading">
+        <div><h1>מאגר ציוד</h1><p id="equipment-count">המאגר נשמר במכשיר הזה וזמין בכל טיסה.</p></div>
+        <div class="database-tools">
+          <input class="search" id="db-search" type="search" placeholder="חיפוש לפי שם, דגם או מספר סידורי" aria-label="חיפוש במאגר">
+          <button class="button secondary" id="export-db" type="button">ייצוא מאגר</button>
+          <button class="button secondary" id="import-db-button" type="button">ייבוא מאגר</button>
+          <input id="import-db-file" type="file" accept="application/json,.json" hidden>
+          <button class="button" id="add-equipment" type="button">＋ &nbsp;הוסף ציוד</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>שם הציוד</th><th>דגם</th><th>מספר סידורי</th><th>כמות ברירת מחדל</th><th>פעולות</th></tr></thead><tbody id="equipment-table"></tbody></table><div class="no-results" id="db-empty" hidden></div></div>
+    </section>
+  </main>
+
+  <section class="print-sheet" id="print-sheet" aria-label="רשימת ציוד להדפסה"></section>
+
+  <dialog id="equipment-dialog">
+    <div class="dialog-head"><h2 id="equipment-dialog-title">הוספת ציוד</h2><button class="icon-button" type="button" data-close="equipment-dialog" aria-label="סגירה">×</button></div>
+    <div class="dialog-content"><form id="equipment-form" class="form-stack">
+      <input type="hidden" id="equipment-id">
+      <div class="field"><label for="equipment-name">שם הציוד</label><input id="equipment-name" required autocomplete="off"></div>
+      <div class="field"><label for="equipment-model">דגם</label><input id="equipment-model" autocomplete="off"></div>
+      <div class="field"><label for="equipment-serial">מספר סידורי</label><input id="equipment-serial" autocomplete="off"></div>
+      <div class="field"><label for="equipment-default-qty">כמות ברירת מחדל</label><input id="equipment-default-qty" type="number" min="1" step="1" value="1" required></div>
+      <div class="dialog-actions"><button class="button" type="submit">שמירה</button><button class="button secondary" type="button" data-close="equipment-dialog">ביטול</button></div>
+    </form></div>
+  </dialog>
+
+  <dialog id="selector-dialog">
+    <div class="dialog-head"><h2 id="selector-title">הוספת ציוד לפליקן</h2><button class="icon-button" type="button" data-close="selector-dialog" aria-label="סגירה">×</button></div>
+    <div class="dialog-content"><input class="selector-search" id="selector-search" type="search" placeholder="חיפוש לפי שם, דגם או מספר סידורי" aria-label="חיפוש ציוד לבחירה"><div class="selector-list" id="selector-list"></div><div class="dialog-actions"><button class="button secondary" type="button" id="manual-item">＋ פריט ידני</button></div></div>
+  </dialog>
+
+  <dialog id="manual-dialog">
+    <div class="dialog-head"><h2>פריט ידני לפליקן</h2><button class="icon-button" type="button" data-close="manual-dialog" aria-label="סגירה">×</button></div>
+    <div class="dialog-content"><form id="manual-form" class="form-stack">
+      <div class="field"><label for="manual-name">שם הציוד</label><input id="manual-name" required autocomplete="off"></div>
+      <div class="field"><label for="manual-model">דגם</label><input id="manual-model" autocomplete="off"></div>
+      <div class="field"><label for="manual-serial">מספר סידורי</label><input id="manual-serial" autocomplete="off"></div>
+      <div class="field"><label for="manual-qty">כמות</label><input id="manual-qty" type="number" min="1" step="1" value="1" required></div>
+      <div class="dialog-actions"><button class="button" type="submit">הוספה לפליקן</button><button class="button secondary" type="button" data-close="manual-dialog">ביטול</button></div>
+    </form></div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <script>
+    (() => {
+      const STORAGE_KEY = 'pelican-equipment-manager-v1';
+      const emptyState = () => ({ equipment: [], trip: { name: '', destination: '', date: '' }, pelicans: [], savedTrips: [] });
+      let state = loadState();
+      let currentPelicanId = null;
+      let toastTimer;
+
+      function loadState() {
+        try {
+          const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+          if (!parsed || typeof parsed !== 'object') return emptyState();
+          return {
+            equipment: Array.isArray(parsed.equipment) ? parsed.equipment : [],
+            trip: { ...emptyState().trip, ...(parsed.trip || {}) },
+            pelicans: Array.isArray(parsed.pelicans) ? parsed.pelicans.map(caseItem => ({ ...caseItem, items: Array.isArray(caseItem.items) ? caseItem.items : [] })) : [],
+            savedTrips: Array.isArray(parsed.savedTrips) ? parsed.savedTrips
+              .filter(saved => saved && typeof saved === 'object' && saved.trip && Array.isArray(saved.pelicans))
+              .map(saved => ({
+                id: typeof saved.id === 'string' ? saved.id : makeId(),
+                trip: { ...emptyState().trip, ...saved.trip },
+                pelicans: saved.pelicans.map(caseItem => ({ ...caseItem, items: Array.isArray(caseItem.items) ? caseItem.items : [] })),
+                savedAt: typeof saved.savedAt === 'string' ? saved.savedAt : ''
+              })) : []
+          };
+        } catch { return emptyState(); }
+      }
+      function persist() {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+        catch { showToast('לא ניתן לשמור במכשיר. בדקו את הגדרות הדפדפן.'); }
+      }
+      function escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+      }
+      function makeId() { return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
+      function showToast(message) {
+        const toast = document.getElementById('toast'); toast.textContent = message; toast.hidden = false;
+        clearTimeout(toastTimer); toastTimer = setTimeout(() => { toast.hidden = true; }, 2500);
+      }
+      function render() {
+        document.querySelectorAll('[data-trip]').forEach(input => { if (input.value !== state.trip[input.dataset.trip]) input.value = state.trip[input.dataset.trip] || ''; });
+        renderCases(); renderSavedTrips(); renderDatabase(); renderPrintList();
+      }
+      function renderCases() {
+        const grid = document.getElementById('case-grid');
+        document.getElementById('case-empty').hidden = state.pelicans.length > 0;
+        document.getElementById('case-subtitle').textContent = state.pelicans.length ? `${state.pelicans.length} פליקנים בטיסה` : 'כל הציוד לטיסה, מסודר לפי פליקן';
+        grid.innerHTML = state.pelicans.map(caseItem => {
+          const rows = caseItem.items.map(item => renderCaseItem(item, caseItem.id)).join('');
+          return `<article class="case-card"><header class="case-head"><div class="case-name"><strong>${escapeHtml(caseItem.name)}</strong><span class="case-count">${caseItem.items.length} פריטים</span></div><div class="case-tools"><button class="icon-button" type="button" data-action="delete-case" data-case="${escapeHtml(caseItem.id)}" aria-label="מחיקת ${escapeHtml(caseItem.name)}" title="מחיקת פליקן">×</button></div></header><div class="case-body">${rows || '<div class="empty-note">הפליקן עדיין ריק</div>'}<button class="case-add" type="button" data-action="add-to-case" data-case="${escapeHtml(caseItem.id)}">＋ הוסף ציוד</button></div></article>`;
+        }).join('');
+      }
+      function renderCaseItem(item, caseId) {
+        const otherCases = state.pelicans.filter(caseItem => caseItem.id !== caseId);
+        const metadata = [item.model, item.serial ? `מס׳ ${item.serial}` : ''].filter(Boolean).join(' · ');
+        const moveControl = otherCases.length ? `<select class="move-select" data-action="move-item" data-case="${escapeHtml(caseId)}" data-item="${escapeHtml(item.id)}" aria-label="העברת ${escapeHtml(item.name)} לפליקן אחר"><option value="">העברה לפליקן…</option>${otherCases.map(other => `<option value="${escapeHtml(other.id)}">${escapeHtml(other.name)}</option>`).join('')}</select>` : '<span></span>';
+        return `<div class="equipment-row"><div class="row-info"><strong>${escapeHtml(item.name)}</strong>${metadata ? `<small>${escapeHtml(metadata)}</small>` : ''}</div><div class="row-controls"><button class="stepper" type="button" data-action="quantity" data-delta="-1" data-case="${escapeHtml(caseId)}" data-item="${escapeHtml(item.id)}" aria-label="הפחתת כמות">−</button><input class="quantity" type="number" min="1" step="1" value="${Math.max(1, Number(item.quantity) || 1)}" data-action="quantity-input" data-case="${escapeHtml(caseId)}" data-item="${escapeHtml(item.id)}" aria-label="כמות ${escapeHtml(item.name)}"><button class="stepper" type="button" data-action="quantity" data-delta="1" data-case="${escapeHtml(caseId)}" data-item="${escapeHtml(item.id)}" aria-label="הגדלת כמות">＋</button></div><div class="row-bottom">${moveControl}<button class="text-button" type="button" data-action="remove-item" data-case="${escapeHtml(caseId)}" data-item="${escapeHtml(item.id)}">הסרה</button></div></div>`;
+      }
+      function renderDatabase() {
+        const query = document.getElementById('db-search').value.trim().toLocaleLowerCase();
+        const items = state.equipment.filter(item => [item.name, item.model, item.serial].some(value => String(value || '').toLocaleLowerCase().includes(query)));
+        document.getElementById('equipment-count').textContent = `${state.equipment.length} פריטים במאגר. המאגר נשמר במכשיר הזה וזמין בכל טיסה.`;
+        document.getElementById('equipment-table').innerHTML = items.map(item => `<tr><td><strong>${escapeHtml(item.name)}</strong></td><td>${escapeHtml(item.model || '—')}</td><td>${escapeHtml(item.serial || '—')}</td><td>${escapeHtml(item.defaultQuantity || 1)}</td><td><div class="table-actions"><button class="button secondary small" type="button" data-action="edit-equipment" data-id="${escapeHtml(item.id)}">עריכה</button><button class="button danger small" type="button" data-action="delete-equipment" data-id="${escapeHtml(item.id)}">מחיקה</button></div></td></tr>`).join('');
+        const empty = document.getElementById('db-empty'); empty.hidden = items.length > 0;
+        empty.textContent = state.equipment.length ? 'לא נמצאו פריטים מתאימים לחיפוש.' : 'המאגר עדיין ריק. הוסיפו ציוד כדי להשתמש בו בטיסות.';
+      }
+      function renderSavedTrips() {
+        const list = document.getElementById('saved-trips-list');
+        document.getElementById('saved-trips-empty').hidden = state.savedTrips.length > 0;
+        list.innerHTML = state.savedTrips.map(saved => {
+          const itemCount = saved.pelicans.reduce((count, caseItem) => count + caseItem.items.length, 0);
+          const details = [saved.trip.destination || 'יעד לא צוין', formatDate(saved.trip.date) || 'תאריך לא צוין'].join(' · ');
+          return `<article class="trip-card"><h2>${escapeHtml(saved.trip.name || 'טיסה ללא שם')}</h2><small>${escapeHtml(details)}</small><p>${saved.pelicans.length} פליקנים · ${itemCount} פריטים</p><div class="trip-card-actions"><button class="button small" type="button" data-trip-action="open" data-trip-id="${escapeHtml(saved.id)}">פתיחת טיסה</button><button class="button danger small" type="button" data-trip-action="delete" data-trip-id="${escapeHtml(saved.id)}">מחיקה</button></div></article>`;
+        }).join('');
+      }
+      function hasActiveTrip() {
+        return Boolean(state.trip.name.trim() || state.trip.destination.trim() || state.trip.date || state.pelicans.length);
+      }
+      function saveActiveTrip() {
+        if (!hasActiveTrip()) return false;
+        state.savedTrips.unshift({
+          id: makeId(),
+          trip: { ...state.trip },
+          pelicans: state.pelicans.map(caseItem => ({ ...caseItem, items: caseItem.items.map(item => ({ ...item })) })),
+          savedAt: new Date().toISOString()
+        });
+        return true;
+      }
+      function renderPrintList() {
+        const trip = state.trip;
+        const meta = [['שם הטיסה', trip.name], ['יעד', trip.destination], ['תאריך', formatDate(trip.date)]];
+        document.getElementById('print-sheet').innerHTML = `<header class="print-header"><h1>רשימת ציוד לטיסה</h1><div class="print-meta">${meta.map(([label, value]) => `<span><strong>${label}:</strong> ${escapeHtml(value || '—')}</span>`).join('')}</div></header>${state.pelicans.length ? state.pelicans.map(caseItem => `<section class="print-case"><h2>${escapeHtml(caseItem.name)}</h2>${caseItem.items.length ? `<ul>${caseItem.items.map(item => `<li>${escapeHtml(item.quantity)} × ${escapeHtml(item.name)}${item.model ? ` · ${escapeHtml(item.model)}` : ''}${item.serial ? ` · מס׳ ${escapeHtml(item.serial)}` : ''}</li>`).join('')}</ul>` : '<div class="print-empty">אין ציוד בפליקן</div>'}</section>`).join('') : '<p class="print-empty">לא נוצרו פליקנים לטיסה זו.</p>'}`;
+      }
+      function formatDate(date) {
+        if (!date) return '';
+        const parts = date.split('-'); return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : date;
+      }
+      function openEquipmentDialog(item) {
+        const form = document.getElementById('equipment-form'); form.reset();
+        document.getElementById('equipment-id').value = item?.id || '';
+        document.getElementById('equipment-name').value = item?.name || '';
+        document.getElementById('equipment-model').value = item?.model || '';
+        document.getElementById('equipment-serial').value = item?.serial || '';
+        document.getElementById('equipment-default-qty').value = item?.defaultQuantity || 1;
+        document.getElementById('equipment-dialog-title').textContent = item ? 'עריכת ציוד' : 'הוספת ציוד';
+        document.getElementById('equipment-dialog').showModal();
+        document.getElementById('equipment-name').focus();
+      }
+      function openSelector(caseId) {
+        currentPelicanId = caseId;
+        document.getElementById('selector-search').value = '';
+        renderSelector(); document.getElementById('selector-dialog').showModal();
+        document.getElementById('selector-search').focus();
+      }
+      function renderSelector() {
+        const query = document.getElementById('selector-search').value.trim().toLocaleLowerCase();
+        const matches = state.equipment.filter(item => [item.name, item.model, item.serial].some(value => String(value || '').toLocaleLowerCase().includes(query)));
+        const list = document.getElementById('selector-list');
+        list.innerHTML = matches.map(item => `<button class="selector-item" type="button" data-select-equipment="${escapeHtml(item.id)}"><span><strong>${escapeHtml(item.name)}</strong><small>${escapeHtml([item.model, item.serial ? `מס׳ ${item.serial}` : ''].filter(Boolean).join(' · ') || 'ללא פרטים נוספים')}</small></span><span>כמות ${escapeHtml(item.defaultQuantity || 1)} ＋</span></button>`).join('') || `<div class="selector-empty">${state.equipment.length ? 'לא נמצאו פריטים. אפשר להוסיף פריט ידני.' : 'מאגר הציוד ריק. אפשר להוסיף פריט ידני.'}</div>`;
+      }
+      function addItemToCase(caseId, source, quantity) {
+        const caseItem = state.pelicans.find(item => item.id === caseId); if (!caseItem) return;
+        const existing = caseItem.items.find(item => source.databaseId && item.databaseId === source.databaseId);
+        if (existing) existing.quantity = (Number(existing.quantity) || 0) + quantity;
+        else caseItem.items.push({ id: makeId(), databaseId: source.databaseId || null, name: source.name, model: source.model || '', serial: source.serial || '', quantity });
+        persist(); render();
+      }
+      function getCaseItem(caseId, itemId) { return state.pelicans.find(item => item.id === caseId)?.items.find(item => item.id === itemId); }
+      document.querySelectorAll('.nav button').forEach(button => button.addEventListener('click', () => {
+        document.getElementById('cases-view').hidden = button.dataset.view !== 'cases';
+        document.getElementById('saved-trips-view').hidden = button.dataset.view !== 'saved-trips';
+        document.getElementById('database-view').hidden = button.dataset.view !== 'database';
+        document.querySelectorAll('.nav button').forEach(nav => nav.setAttribute('aria-current', nav === button ? 'page' : 'false'));
+      }));
+      document.querySelectorAll('[data-trip]').forEach(input => input.addEventListener('input', () => { state.trip[input.dataset.trip] = input.value; persist(); renderPrintList(); }));
+      document.getElementById('new-trip').addEventListener('click', () => {
+        if (!confirm('לפתוח טיסה חדשה? הטיסה הנוכחית תישמר ברשימת הטיסות אם הוזנו בה פרטים או ציוד. מאגר הציוד יישאר ללא שינוי.')) return;
+        const saved = saveActiveTrip();
+        state.trip = emptyState().trip; state.pelicans = []; persist(); render();
+        showToast(saved ? 'הטיסה נשמרה ונפתחה טיסה חדשה' : 'הטיסה החדשה מוכנה');
+      });
+      document.getElementById('saved-trips-list').addEventListener('click', event => {
+        const button = event.target.closest('[data-trip-action]'); if (!button) return;
+        const saved = state.savedTrips.find(item => item.id === button.dataset.tripId); if (!saved) return;
+        if (button.dataset.tripAction === 'delete') {
+          if (!confirm(`למחוק את הטיסה "${saved.trip.name || 'ללא שם'}" מהטיסות השמורות?`)) return;
+          state.savedTrips = state.savedTrips.filter(item => item.id !== saved.id); persist(); renderSavedTrips(); showToast('הטיסה נמחקה');
+          return;
+        }
+        if (button.dataset.tripAction === 'open') {
+          if (!confirm('לפתוח את הטיסה השמורה? הטיסה הפעילה תישמר ברשימה אם הוזנו בה פרטים או ציוד.')) return;
+          state.savedTrips = state.savedTrips.filter(item => item.id !== saved.id);
+          saveActiveTrip();
+          state.trip = { ...emptyState().trip, ...saved.trip };
+          state.pelicans = saved.pelicans.map(caseItem => ({ ...caseItem, items: caseItem.items.map(item => ({ ...item })) }));
+          persist(); render(); showToast('הטיסה השמורה נפתחה');
+        }
+      });
+      document.getElementById('add-case').addEventListener('click', () => {
+        const next = state.pelicans.reduce((max, caseItem) => Math.max(max, Number(caseItem.name.match(/\d+/)?.[0]) || 0), 0) + 1;
+        state.pelicans.push({ id: makeId(), name: `P${String(next).padStart(2, '0')}`, items: [] }); persist(); render();
+      });
+      document.getElementById('full-list').addEventListener('click', () => { renderPrintList(); window.print(); });
+      document.getElementById('add-equipment').addEventListener('click', () => openEquipmentDialog());
+      document.getElementById('db-search').addEventListener('input', renderDatabase);
+      document.getElementById('equipment-form').addEventListener('submit', event => {
+        event.preventDefault();
+        const id = document.getElementById('equipment-id').value;
+        const item = { id: id || makeId(), name: document.getElementById('equipment-name').value.trim(), model: document.getElementById('equipment-model').value.trim(), serial: document.getElementById('equipment-serial').value.trim(), defaultQuantity: Math.max(1, Number(document.getElementById('equipment-default-qty').value) || 1) };
+        if (!item.name) return;
+        if (id) state.equipment = state.equipment.map(existing => existing.id === id ? item : existing); else state.equipment.push(item);
+        persist(); render(); document.getElementById('equipment-dialog').close(); showToast(id ? 'פרטי הציוד עודכנו' : 'הציוד נוסף למאגר');
+      });
+      document.getElementById('selector-search').addEventListener('input', renderSelector);
+      document.getElementById('manual-item').addEventListener('click', () => { document.getElementById('manual-form').reset(); document.getElementById('manual-qty').value = 1; document.getElementById('manual-dialog').showModal(); document.getElementById('manual-name').focus(); });
+      document.getElementById('manual-form').addEventListener('submit', event => {
+        event.preventDefault(); const name = document.getElementById('manual-name').value.trim(); if (!name) return;
+        addItemToCase(currentPelicanId, { name, model: document.getElementById('manual-model').value.trim(), serial: document.getElementById('manual-serial').value.trim() }, Math.max(1, Number(document.getElementById('manual-qty').value) || 1));
+        document.getElementById('manual-dialog').close(); document.getElementById('selector-dialog').close(); showToast('הפריט נוסף לפליקן');
+      });
+      document.getElementById('selector-list').addEventListener('click', event => {
+        const button = event.target.closest('[data-select-equipment]'); if (!button) return;
+        const item = state.equipment.find(equipment => equipment.id === button.dataset.selectEquipment); if (!item) return;
+        addItemToCase(currentPelicanId, { databaseId: item.id, name: item.name, model: item.model, serial: item.serial }, Math.max(1, Number(item.defaultQuantity) || 1));
+        document.getElementById('selector-dialog').close(); showToast('הציוד נוסף לפליקן');
+      });
+      document.getElementById('case-grid').addEventListener('click', event => {
+        const button = event.target.closest('[data-action]'); if (!button) return;
+        const { action, case: caseId, item: itemId } = button.dataset;
+        if (action === 'add-to-case') openSelector(caseId);
+        if (action === 'delete-case') {
+          const caseItem = state.pelicans.find(item => item.id === caseId); if (!caseItem || !confirm(`למחוק את ${caseItem.name} ואת הציוד המשויך אליו?`)) return;
+          state.pelicans = state.pelicans.filter(item => item.id !== caseId); persist(); render();
+        }
+        if (action === 'quantity') {
+          const row = getCaseItem(caseId, itemId); if (!row) return;
+          row.quantity = Math.max(1, (Number(row.quantity) || 1) + Number(button.dataset.delta)); persist(); render();
+        }
+        if (action === 'remove-item') {
+          const row = getCaseItem(caseId, itemId); if (!row || !confirm(`להסיר את ${row.name} מהפליקן?`)) return;
+          const caseItem = state.pelicans.find(item => item.id === caseId); caseItem.items = caseItem.items.filter(item => item.id !== itemId); persist(); render();
+        }
+      });
+      document.getElementById('equipment-table').addEventListener('click', event => {
+        const button = event.target.closest('[data-action]'); if (!button) return;
+        const item = state.equipment.find(equipment => equipment.id === button.dataset.id); if (!item) return;
+        if (button.dataset.action === 'edit-equipment') openEquipmentDialog(item);
+        if (button.dataset.action === 'delete-equipment' && confirm(`למחוק את ${item.name} ממאגר הציוד? ציוד שכבר נוסף לפליקן יישאר בו.`)) {
+          state.equipment = state.equipment.filter(equipment => equipment.id !== item.id); persist(); render();
+        }
+      });
+      document.getElementById('case-grid').addEventListener('change', event => {
+        const control = event.target;
+        if (control.dataset.action === 'quantity-input') {
+          const item = getCaseItem(control.dataset.case, control.dataset.item); if (!item) return;
+          item.quantity = Math.max(1, Math.floor(Number(control.value) || 1)); persist(); render();
+        }
+        if (control.dataset.action === 'move-item' && control.value) {
+          const origin = state.pelicans.find(caseItem => caseItem.id === control.dataset.case);
+          const destination = state.pelicans.find(caseItem => caseItem.id === control.value);
+          const index = origin?.items.findIndex(item => item.id === control.dataset.item) ?? -1;
+          if (!origin || !destination || index < 0) return;
+          const [item] = origin.items.splice(index, 1);
+          const existing = item.databaseId && destination.items.find(other => other.databaseId === item.databaseId);
+          if (existing) existing.quantity = (Number(existing.quantity) || 0) + (Number(item.quantity) || 1); else destination.items.push(item);
+          persist(); render(); showToast(`הציוד הועבר אל ${destination.name}`);
+        }
+      });
+      document.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', () => document.getElementById(button.dataset.close).close()));
+      document.getElementById('export-db').addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(state.equipment, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'מאגר-ציוד.json'; link.click(); URL.revokeObjectURL(url);
+      });
+      document.getElementById('import-db-button').addEventListener('click', () => document.getElementById('import-db-file').click());
+      document.getElementById('import-db-file').addEventListener('change', async event => {
+        const file = event.target.files?.[0]; if (!file) return;
+        try {
+          const imported = JSON.parse(await file.text());
+          if (!Array.isArray(imported) || imported.some(item => !item || typeof item.name !== 'string' || !item.name.trim())) throw new Error('invalid');
+          const equipment = imported.map(item => ({ id: typeof item.id === 'string' ? item.id : makeId(), name: item.name.trim(), model: String(item.model || ''), serial: String(item.serial || ''), defaultQuantity: Math.max(1, Number(item.defaultQuantity ?? item.quantity) || 1) }));
+          if (!confirm(`לייבא ${equipment.length} פריטים? המאגר הקיים יוחלף.`)) return;
+          state.equipment = equipment; persist(); render(); showToast('מאגר הציוד יובא בהצלחה');
+        } catch { alert('קובץ המאגר אינו תקין. לא בוצעו שינויים.'); }
+        finally { event.target.value = ''; }
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>
