@@ -1,0 +1,379 @@
+[
+  {
+    "id": "base-1",
+    "name": "J9 long power cables",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-2",
+    "name": "J10 Data cable",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-3",
+    "name": "J11 Cable for RfSwBox",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-4",
+    "name": "RF cables- from bnet to Rf Sw Box [2.5m]",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-5",
+    "name": "RF cables- from Rf Sw Box to Ant [0.5m]",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-6",
+    "name": "RF cables- [3m]",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-7",
+    "name": "IMAR 168-IIPSC-PT",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-8",
+    "name": "DATA cable IMAR",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-9",
+    "name": "power cable IMAR",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-10",
+    "name": "Antenna MTI - MT050D28VH-A",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-11",
+    "name": "Tripod gibraltar",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-12",
+    "name": "Long power cable for 220V",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-13",
+    "name": "power strip",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-14",
+    "name": "power conventor isr-eur",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-15",
+    "name": "Long ETH cables (Gigador)",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-16",
+    "name": "Anker battery",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-17",
+    "name": "TUBE WELDMENT",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-18",
+    "name": "BASE WELDMENT",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-19",
+    "name": "BNET CLAMP WELD",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-20",
+    "name": "Screw set for MECHANICS",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-21",
+    "name": "headset",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-22",
+    "name": "speaker + mic",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-23",
+    "name": "RJ 45 cables",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-24",
+    "name": "Laptop dell + charger",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-25",
+    "name": "mouse",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-26",
+    "name": "Chapman tool",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-27",
+    "name": "P touch",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-28",
+    "name": "zip tie",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-29",
+    "name": "strips",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-30",
+    "name": "electric screw driver",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "base-31",
+    "name": "quickset + adapter 4-69010-3+4-55730-2",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-01",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "01",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-02",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "02",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-03",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "03",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-04",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "04",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-05",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "05",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-06",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "06",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-07",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "07",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-08",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "08",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-09",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "09",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-10",
+    "name": "BNET HCLOS TAWAN",
+    "serial": "10",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-01",
+    "name": "RF SW BOX DUAL",
+    "serial": "01",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-02",
+    "name": "RF SW BOX DUAL",
+    "serial": "02",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-03",
+    "name": "RF SW BOX DUAL",
+    "serial": "03",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-04",
+    "name": "RF SW BOX DUAL",
+    "serial": "04",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-05",
+    "name": "RF SW BOX DUAL",
+    "serial": "05",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-06",
+    "name": "RF SW BOX DUAL",
+    "serial": "06",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-07",
+    "name": "RF SW BOX DUAL",
+    "serial": "07",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-08",
+    "name": "RF SW BOX DUAL",
+    "serial": "08",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-09",
+    "name": "RF SW BOX DUAL",
+    "serial": "09",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "rfsw-10",
+    "name": "RF SW BOX DUAL",
+    "serial": "10",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "router-01",
+    "name": "ROUTER",
+    "serial": "01",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "router-02",
+    "name": "ROUTER",
+    "serial": "02",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "router-03",
+    "name": "ROUTER",
+    "serial": "03",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "router-04",
+    "name": "ROUTER",
+    "serial": "04",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "router-05",
+    "name": "ROUTER",
+    "serial": "05",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "tdk-01",
+    "name": "POWER SUPLLY TDK",
+    "serial": "01",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "tdk-02",
+    "name": "POWER SUPLLY TDK",
+    "serial": "02",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "tdk-03",
+    "name": "POWER SUPLLY TDK",
+    "serial": "03",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "tdk-04",
+    "name": "POWER SUPLLY TDK",
+    "serial": "04",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "tdk-05",
+    "name": "POWER SUPLLY TDK",
+    "serial": "05",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "silver-01",
+    "name": "POWER SUPLLY SILVER",
+    "serial": "01",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "silver-02",
+    "name": "POWER SUPLLY SILVER",
+    "serial": "02",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "silver-03",
+    "name": "POWER SUPLLY SILVER",
+    "serial": "03",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "silver-04",
+    "name": "POWER SUPLLY SILVER",
+    "serial": "04",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "silver-05",
+    "name": "POWER SUPLLY SILVER",
+    "serial": "05",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "toolbox-01",
+    "name": "TOOLBOX",
+    "serial": "01",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "toolbox-02",
+    "name": "TOOLBOX",
+    "serial": "02",
+    "defaultQuantity": 1
+  }
+]

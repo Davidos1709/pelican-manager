@@ -194,7 +194,13 @@
           <button class="button secondary" id="export-db" type="button">ייצוא מאגר</button>
           <button class="button secondary" id="import-db-button" type="button">ייבוא מאגר</button>
           <input id="import-db-file" type="file" accept="application/json,.json" hidden>
-          <button class="button" id="add-equipment" type="button">＋ &nbsp;הוסף ציוד</button>
+<button class="button" id="add-equipment" type="button">
+  ＋ הוסף ציוד
+</button>
+
+<button class="button secondary" id="add-series" type="button">
+  📦 צור סדרה
+</button>
         </div>
       </div>
       <div class="table-wrap"><table><thead><tr><th>שם הציוד</th><th>דגם</th><th>מספר סידורי</th><th>כמות ברירת מחדל</th><th>פעולות</th></tr></thead><tbody id="equipment-table"></tbody></table><div class="no-results" id="db-empty" hidden></div></div>
@@ -230,7 +236,38 @@
       <div class="dialog-actions"><button class="button" type="submit">הוספה לפליקן</button><button class="button secondary" type="button" data-close="manual-dialog">ביטול</button></div>
     </form></div>
   </dialog>
+<dialog id="series-dialog">
+  <div class="dialog-head">
+    <h2>יצירת סדרת ציוד</h2>
+    <button class="icon-button" type="button" data-close="series-dialog">×</button>
+  </div>
 
+  <div class="dialog-content">
+    <form id="series-form" class="form-stack">
+
+      <div class="field">
+        <label>שם ציוד</label>
+        <input id="series-name" required>
+      </div>
+
+      <div class="field">
+        <label>מספר ראשון</label>
+        <input id="series-start" type="number" value="1">
+      </div>
+
+      <div class="field">
+        <label>מספר אחרון</label>
+        <input id="series-end" type="number" value="10">
+      </div>
+
+      <div class="dialog-actions">
+        <button class="button" type="submit">צור סדרה</button>
+        <button class="button secondary" type="button" data-close="series-dialog">ביטול</button>
+      </div>
+
+    </form>
+  </div>
+</dialog>
   <div class="toast" id="toast" role="status" hidden></div>
   <script>
     (() => {
@@ -296,7 +333,8 @@
 document.getElementById('equipment-count').textContent =
 query
   ? `${items.length} מתוך ${state.equipment.length} פריטים מוצגים`
-  : `${state.equipment.length} פריטים במאגר. המאגר נשמר במכשיר הזה וזמין בכל טיסה.`;        document.getElementById('equipment-table').innerHTML = items.map(item => `<tr><td><strong>${escapeHtml(item.name)}</strong></td><td>${escapeHtml(item.model || '—')}</td><td>${escapeHtml(item.serial || '—')}</td><td>${escapeHtml(item.defaultQuantity || 1)}</td><td><div class="table-actions"><button class="button secondary small" type="button" data-action="edit-equipment" data-id="${escapeHtml(item.id)}">עריכה</button><button class="button danger small" type="button" data-action="delete-equipment" data-id="${escapeHtml(item.id)}">מחיקה</button></div></td></tr>`).join('');
+  : `${state.equipment.length} פריטים במאגר. המאגר נשמר במכשיר הזה וזמין בכל טיסה.`;
+          document.getElementById('equipment-table').innerHTML = items.map(item => `<tr><td><strong>${escapeHtml(item.name)}</strong></td><td>${escapeHtml(item.model || '—')}</td><td>${escapeHtml(item.serial || '—')}</td><td>${escapeHtml(item.defaultQuantity || 1)}</td><td><div class="table-actions"><button class="button secondary small" type="button" data-action="edit-equipment" data-id="${escapeHtml(item.id)}">עריכה</button><button class="button danger small" type="button" data-action="delete-equipment" data-id="${escapeHtml(item.id)}">מחיקה</button></div></td></tr>`).join('');
         const empty = document.getElementById('db-empty'); empty.hidden = items.length > 0;
         empty.textContent = state.equipment.length ? 'לא נמצאו פריטים מתאימים לחיפוש.' : 'המאגר עדיין ריק. הוסיפו ציוד כדי להשתמש בו בטיסות.';
       }
@@ -398,6 +436,9 @@ query
       });
       document.getElementById('full-list').addEventListener('click', () => { renderPrintList(); window.print(); });
       document.getElementById('add-equipment').addEventListener('click', () => openEquipmentDialog());
+      document.getElementById('add-series').addEventListener('click', () => {
+  document.getElementById('series-dialog').showModal();
+});
       document.getElementById('db-search').addEventListener('input', renderDatabase);
       document.getElementById('equipment-form').addEventListener('submit', event => {
         event.preventDefault();
@@ -479,6 +520,45 @@ query
         } catch { alert('קובץ המאגר אינו תקין. לא בוצעו שינויים.'); }
         finally { event.target.value = ''; }
       });
+      document.getElementById('series-form').addEventListener('submit', event => {
+
+  event.preventDefault();
+
+  const name =
+    document.getElementById('series-name').value.trim();
+
+  const start =
+    Number(document.getElementById('series-start').value);
+
+  const end =
+    Number(document.getElementById('series-end').value);
+
+  if (!name || start > end)
+   {
+    alert('נתונים לא תקינים');
+    return;
+  }
+
+  for (let i = start; i <= end; i++) {
+
+    state.equipment.push({
+      id: makeId(),
+      name: name,
+      model: '',
+      serial: String(i).padStart(2, '0'),
+      defaultQuantity: 1
+    });
+
+  }
+
+  persist();
+  render();
+
+  document.getElementById('series-dialog').close();
+
+  showToast(`נוצרו ${end - start + 1} פריטים`);
+
+});
       render();
     })();
   </script>

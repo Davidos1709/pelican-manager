@@ -1,0 +1,317 @@
+[
+  {
+    "id": "1",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "2",
+    "name": "J9 long power cables",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "3",
+    "name": "J10 Data cable",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "4",
+    "name": "J11 Cable for RfSwBox",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "5",
+    "name": "RF cables- from bnet to Rf Sw Box [2.5m]",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "6",
+    "name": "RF cables- from Rf Sw Box to Ant [0.5m]",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "7",
+    "name": "RF cables- [3m]",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "8",
+    "name": "IMAR 168-IIPSC-PT",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "9",
+    "name": "DATA cable IMAR",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "10",
+    "name": "power cable IMAR",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "11",
+    "name": "Antenna MTI - MT050D28VH-A",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "12",
+    "name": "RF SW BOX DUAL",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "13",
+    "name": "Tripod gibraltar",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "14",
+    "name": "power suplly 220-24 (silver) for the BNET",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "15",
+    "name": "Long power cable for 220V",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "16",
+    "name": "power strip",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "17",
+    "name": "power conventor isr-eur",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "18",
+    "name": "Long ETH cables (Gigador)",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "19",
+    "name": "Anker battery",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "20",
+    "name": "TUBE WELDMENT",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "21",
+    "name": "BASE WELDMENT",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "22",
+    "name": "BNET CLAMP WELD",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "23",
+    "name": "Screw set for MECHANICS",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "24",
+    "name": "Toolbox",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "25",
+    "name": "headset",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "26",
+    "name": "speaker + mic",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "27",
+    "name": "RJ 45 cables",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "28",
+    "name": "Laptop dell + charger",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "29",
+    "name": "mouse",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "30",
+    "name": "Chapman tool",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "31",
+    "name": "P touch",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "32",
+    "name": "zip tie",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "33",
+    "name": "strips",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "34",
+    "name": "electric screw driver",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "35",
+    "name": "quickset + adapter 4-69010-3+4-55730-2",
+    "model": "",
+    "serial": "",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-01",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "01",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-02",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "02",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-03",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "03",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-04",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "04",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-05",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "05",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-06",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "06",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-07",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "07",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-08",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "08",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-09",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "09",
+    "defaultQuantity": 1
+  },
+  {
+    "id": "bnet-10",
+    "name": "BNET HCLOS TAWAN",
+    "model": "",
+    "serial": "10",
+    "defaultQuantity": 1
+  }
+]
