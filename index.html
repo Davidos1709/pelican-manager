@@ -665,6 +665,14 @@ dialog::backdrop{background:rgba(4,7,10,.74)}
               <div class="field span2"><label for="set-operator">PREPARED BY (MANIFEST SIGNATORY)</label><input class="input" id="set-operator" data-setting="operator" autocomplete="name" placeholder="Full name"></div>
               <div class="field"><label for="set-email-to">CARNET EMAIL · TO</label><input class="input mono" id="set-email-to" data-setting="emailTo" type="email" placeholder="customs@company"></div>
               <div class="field"><label for="set-email-cc">CARNET EMAIL · CC</label><input class="input mono" id="set-email-cc" data-setting="emailCc" type="email" placeholder="optional"></div>
+              <div class="field span2"><label for="set-mail-client">EMAIL APP (THIS DEVICE)</label>
+                <select class="input" id="set-mail-client" data-setting="mailClient">
+                  <option value="auto">AUTO · OUTLOOK APP ON PHONE, DEFAULT MAIL ON PC</option>
+                  <option value="outlook-app">OUTLOOK APP</option>
+                  <option value="outlook-web">OUTLOOK WEB (OFFICE 365)</option>
+                  <option value="default">DEVICE DEFAULT MAIL APP</option>
+                </select>
+              </div>
             </div>
           </article>
           <article class="panel">
@@ -895,7 +903,7 @@ function baselineEquipment() {
    ========================================================================== */
 const blankState = () => ({
   version: 2, seq: 0, activeMissionId: null,
-  settings: { operator: '', emailTo: '', emailCc: '', pnMap: DEFAULT_PN_MAP.map(x => ({ ...x })) },
+  settings: { operator: '', emailTo: '', emailCc: '', mailClient: 'auto', pnMap: DEFAULT_PN_MAP.map(x => ({ ...x })) },
   equipment: [], missions: [], carnets: [], drafts: {}
 });
 const str = v => (v === null || v === undefined ? '' : String(v));
@@ -918,6 +926,7 @@ function normalizeState(raw) {
   s.settings.operator = str(settings.operator);
   s.settings.emailTo = str(settings.emailTo);
   s.settings.emailCc = str(settings.emailCc);
+  s.settings.mailClient = ['auto', 'outlook-app', 'outlook-web', 'default'].includes(settings.mailClient) ? settings.mailClient : 'auto';
   if (Array.isArray(settings.pnMap)) s.settings.pnMap = settings.pnMap.filter(x => x && typeof x === 'object').map(x => ({ name: str(x.name), pn: str(x.pn) }));
   s.equipment = Array.isArray(raw.equipment) ? raw.equipment.filter(e => e && str(e.name).trim()).map(cleanEquipment) : [];
   s.missions = Array.isArray(raw.missions) ? raw.missions.filter(m => m && typeof m === 'object').map(cleanMission) : [];
@@ -1461,11 +1470,33 @@ function prepareEmail(m, units) {
     'Excel declaration attached.', '',
     state.settings.operator || ''
   ].join('\r\n');
-  const params = [];
-  if (state.settings.emailCc.trim()) params.push(`cc=${encodeURIComponent(state.settings.emailCc.trim())}`);
-  params.push(`subject=${encodeURIComponent(`ATA CARNET · ${m.name}${m.country ? ` · ${m.country}` : ''}`)}`, `body=${encodeURIComponent(body)}`);
-  window.location.href = `mailto:${state.settings.emailTo.trim().replace(/\s+/g, '')}?${params.join('&')}`;
+  const to = state.settings.emailTo.trim().replace(/\s+/g, '');
+  const cc = state.settings.emailCc.trim().replace(/\s+/g, '');
+  const subject = `ATA CARNET · ${m.name}${m.country ? ` · ${m.country}` : ''}`;
+  const q = (withTo) => [withTo && to ? `to=${encodeURIComponent(to)}` : '', cc ? `cc=${encodeURIComponent(cc)}` : '', `subject=${encodeURIComponent(subject)}`, `body=${encodeURIComponent(body)}`].filter(Boolean).join('&');
+  const mailto = `mailto:${to}?${q(false)}`;
+  const client = resolveMailClient();
+  if (client === 'outlook-app') {
+    // If the Outlook app is not installed the page stays visible; fall back to the default mail app
+    let left = false;
+    const onHide = () => { left = true; };
+    document.addEventListener('visibilitychange', onHide, { once: true });
+    window.location.href = `ms-outlook://compose?${q(true)}`;
+    setTimeout(() => {
+      document.removeEventListener('visibilitychange', onHide);
+      if (!left && document.visibilityState === 'visible') { toast('OUTLOOK APP NOT FOUND · OPENING DEFAULT MAIL APP', 'warn'); window.location.href = mailto; }
+    }, 1800);
+  } else if (client === 'outlook-web') {
+    window.open(`https://outlook.office.com/mail/deeplink/compose?${q(true)}`, '_blank', 'noopener');
+  } else {
+    window.location.href = mailto;
+  }
   toast('EXCEL EXPORTED · ATTACH IT TO THE OUTLOOK DRAFT');
+}
+function resolveMailClient() {
+  const pref = state.settings.mailClient || 'auto';
+  if (pref !== 'auto') return pref;
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'outlook-app' : 'default';
 }
 
 /* ==========================================================================
