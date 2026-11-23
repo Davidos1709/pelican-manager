@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PELICAN OPS</title>
+
+<style>
+:root{
+    --bg:#0a0f14;
+    --panel:#121922;
+    --panel2:#161f2b;
+    --border:#243244;
+    --text:#edf3f8;
+    --muted:#93a4b8;
+    --green:#00d26a;
+    --amber:#ffb300;
+    --danger:#ff5252;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:Segoe UI,Arial,sans-serif;
+    min-height:100vh;
+}
+
+.app{
+    display:flex;
+    min-height:100vh;
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    width:260px;
+    background:#10161d;
+    border-left:1px solid var(--border);
+    padding:22px;
+}
+
+.logo{
+    margin-bottom:30px;
+}
+
+.logo h1{
+    font-size:32px;
+    letter-spacing:1px;
+}
+
+.logo p{
+    color:var(--muted);
+    margin-top:8px;
+    font-size:12px;
+    text-transform:uppercase;
+}
+
+.nav-title{
+    color:var(--muted);
+    margin-bottom:12px;
+    font-size:12px;
+    letter-spacing:2px;
+}
+
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.nav button{
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    text-align:right;
+    padding:14px;
+    cursor:pointer;
+    border-radius:4px;
+}
+
+.nav button:hover{
+    border-color:var(--green);
+}
+
+.nav button.active{
+    background:#16314b;
+}
+
+/* MAIN */
+
+.main{
+    flex:1;
+    padding:24px;
+}
+
+/* HEADER */
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.status{
+    font-weight:700;
+    color:var(--green);
+}
+
+.page-title{
+    font-size:34px;
+    font-weight:800;
+}
+
+/* STATUS BAR */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:16px;
+    margin-bottom:25px;
+}
+
+.stat{
+    background:var(--panel);
+    border:1px solid var(--border);
+    padding:20px;
+}
+
+.stat-label{
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:10px;
+}
+
+.stat-value{
+    font-size:34px;
+    font-weight:800;
+}
+
+/* PANELS */
+
+.panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    margin-bottom:20px;
+}
+
+.panel-head{
+    padding:16px 20px;
+    border-bottom:1px solid var(--border);
+    background:var(--panel2);
+}
+
+.panel-head h2{
+    font-size:22px;
+    letter-spacing:1px;
+}
+
+.panel-body{
+    padding:24px;
+}
+
+.panel-body p{
+    line-height:2;
+    color:var(--muted);
+}
+
+.ops-button{
+    margin-top:18px;
+    background:transparent;
+    border:1px solid var(--green);
+    color:var(--green);
+    padding:12px 20px;
+    cursor:pointer;
+    font-weight:700;
+}
+
+.ops-button:hover{
+    background:var(--green);
+    color:#000;
+}
+
+/* MOBILE */
+
+.mobile-nav{
+    display:none;
+}
+
+@media(max-width:900px){
+
+    .app{
+        flex-direction:column;
+    }
+
+    .sidebar{
+        display:none;
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .mobile-nav{
+        display:flex;
+        position:fixed;
+        bottom:0;
+        right:0;
+        left:0;
+        background:#10161d;
+        border-top:1px solid var(--border);
+    }
+
+    .mobile-nav button{
+        flex:1;
+        padding:14px;
+        background:none;
+        color:var(--text);
+        border:none;
+    }
+
+    .main{
+        padding-bottom:80px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h1>PELICAN OPS</h1>
+            <p>Logistics Operations Center</p>
+        </div>
+
+        <div class="nav-title">
+            MISSION CONTROL
+        </div>
+
+        <div class="nav">
+
+            <button class="active">
+                [DASH] Dashboard
+            </button>
+
+            <button>
+                [CARNET] ATA Carnets
+            </button>
+
+            <button>
+                [PACKING] Pelicans
+            </button>
+
+            <button>
+                [MISSION] Projects
+            </button>
+
+            <button>
+                [REPORT] Reports
+            </button>
+
+            <button>
+                [SYSTEM] Settings
+            </button>
+
+        </div>
+
+    </aside>
+
+    <main class="main">
+
+        <div class="top">
+
+            <div>
+                <div class="page-title">
+                    MISSION DASHBOARD
+                </div>
+            </div>
+
+            <div class="status">
+                ● SYSTEM ONLINE
+            </div>
+
+        </div>
+
+        <div class="stats">
+
+            <div class="stat">
+                <div class="stat-label">
+                    ACTIVE EQUIPMENT
+                </div>
+                <div class="stat-value">
+                    68
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">
+                    ACTIVE MISSIONS
+                </div>
+                <div class="stat-value">
+                    04
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">
+                    ACTIVE CARNETS
+                </div>
+                <div class="stat-value">
+                    02
+                </div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">
+                    ACTIVE PELICANS
+                </div>
+                <div class="stat-value">
+                    11
+                </div>
+            </div>
+
+        </div>
+
+        <section class="panel">
+
+            <div class="panel-head">
+                <h2>ATA CARNET CONTROL</h2>
+            </div>
+
+            <div class="panel-body">
+
+                <p>
+                    Customs Documentation<br>
+                    Export Declarations<br>
+                    Excel Generation<br>
+                    Carnet History
+                </p>
+
+                <button class="ops-button">
+                    ENTER CONSOLE →
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="panel">
+
+            <div class="panel-head">
+                <h2>PACKING MANIFEST SYSTEM</h2>
+            </div>
+
+            <div class="panel-body">
+
+                <p>
+                    Pelican Assignment<br>
+                    Packing Lists<br>
+                    PDF Generation<br>
+                    Equipment Allocation
+                </p>
+
+                <button class="ops-button">
+                    ENTER CONSOLE →
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="panel">
+
+            <div class="panel-head">
+                <h2>MISSION ARCHIVE</h2>
+            </div>
+
+            <div class="panel-body">
+
+                <p>
+                    Germany Demo<br>
+                    India Customer Visit<br>
+                    UK Flight
+                </p>
+
+                <button class="ops-button">
+                    OPEN ARCHIVE →
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<div class="mobile-nav">
+    <button>DASH</button>
+    <button>CARNET</button>
+    <button>PACKING</button>
+    <button>MISSION</button>
+</div>
+
+<script>
+// placeholder for future navigation
+console.log("PELICAN OPS V4");
+</script>
+
+</body>
+</html>
