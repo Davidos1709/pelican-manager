@@ -103,6 +103,7 @@ button.sys:hover{background:var(--panel-2)}
 
 .main{width:100%;max-width:1640px;padding:24px 24px 56px}
 .view:not([hidden]){animation:fade .28s ease both}
+.credits{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);text-align:center;font:600 10px/1.6 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
 
 /* ---------- Section labels ---------- */
 .section-label{display:flex;align-items:center;gap:12px;margin:30px 0 12px;font:600 11px/1 var(--mono);letter-spacing:.2em;color:var(--muted)}
@@ -703,6 +704,7 @@ dialog::backdrop{background:rgba(4,7,10,.74)}
           </article>
         </div>
       </section>
+      <footer class="credits">Created by David Or Sudri and Yahav Vaknin</footer>
     </main>
   </div>
 </div>
@@ -2325,21 +2327,6 @@ function initCloud() {
 /* ==========================================================================
    BOOT
    ========================================================================== */
-// Hosting providers may inject a floating badge over the bottom navigation
-function hideHostBadges() {
-  const isBadge = el => {
-    if (!(el instanceof HTMLElement) || el.closest('.app, .bottom-nav, dialog, #toast, #print-sheet, #mesh')) return false;
-    const text = `${el.id} ${el.className} ${el.getAttribute('src') || ''} ${el.textContent || ''} ${el.shadowRoot?.textContent || ''}`;
-    return /netlify/i.test(text);
-  };
-  const sweep = () => [...document.body.children, ...document.documentElement.children].forEach(el => {
-    if (isBadge(el)) el.style.setProperty('display', 'none', 'important');
-  });
-  sweep();
-  const obs = new MutationObserver(sweep);
-  obs.observe(document.body, { childList: true });
-  obs.observe(document.documentElement, { childList: true });
-}
 buildMesh();
 tickClock();
 setInterval(tickClock, 1000);
@@ -2348,7 +2335,6 @@ persist();
 renderChrome();
 showRoute();
 initCloud();
-hideHostBadges();
 if (bootNotice) toast(bootNotice);
 })();
 </script>
