@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0A0F14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pelican Ops">
 <title>PELICAN OPS · Logistics Operations Center</title>
 <style>
 /* ==========================================================================
@@ -24,7 +28,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0}
-html{scrollbar-color:var(--border-2) var(--bg)}
+html{scrollbar-color:var(--border-2) var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *{scrollbar-width:thin;scrollbar-color:var(--border-2) transparent}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:transparent}
@@ -370,7 +374,7 @@ dialog::backdrop{background:rgba(4,7,10,.74)}
   .top-cell.sys{order:1;padding:0 14px;border-left:0}
   .top-cell.mission{order:2;flex:1 1 100%;padding:9px 14px;border-left:0;border-top:1px solid var(--border)}
   .mission-select{max-width:none;width:100%}
-  .main{padding:16px 14px 96px}
+  .main{padding:16px 14px calc(92px + env(safe-area-inset-bottom))}
   .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .stat-value{font-size:34px}
   .module-grid,.settings-grid{grid-template-columns:1fr}
@@ -378,13 +382,25 @@ dialog::backdrop{background:rgba(4,7,10,.74)}
   .arch-row{grid-template-columns:minmax(0,1fr) auto;gap:4px 12px}
   .arch-row .code{grid-column:1/-1}
   .arch-row .cell{display:none}
-  .bottom-nav{position:fixed;z-index:30;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(6,1fr);padding-bottom:env(safe-area-inset-bottom);background:rgba(13,19,26,.97);border-top:1px solid var(--border)}
-  .bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:5px;padding:15px 2px 15px;border-top:2px solid transparent;margin-top:-1px;text-decoration:none;color:var(--dim)}
-  .bottom-nav .tag{font:700 9.5px/1 var(--mono);letter-spacing:.04em}
-  .bottom-nav .lbl{font:600 10.5px/1 var(--sans);color:var(--dim)}
-  .bottom-nav a[aria-current="page"]{border-top-color:var(--green);color:var(--green)}
+  .topbar{padding-top:env(safe-area-inset-top)}
+  .mobile-brand{padding-left:max(14px,env(safe-area-inset-left))}
+  .bottom-nav{position:fixed;z-index:30;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));padding:0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);background:rgba(13,19,26,.98);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:1px solid var(--border)}
+  .bottom-nav a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;min-height:60px;padding:8px 2px;text-decoration:none;color:var(--dim);-webkit-tap-highlight-color:transparent}
+  .bottom-nav a::before{content:"";position:absolute;top:-1px;left:22%;right:22%;height:2px;background:transparent;transition:background .15s}
+  .bottom-nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:square;stroke-linejoin:miter}
+  .bottom-nav .lbl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 11px/1 var(--sans);letter-spacing:.01em}
+  .bottom-nav a[aria-current="page"]{color:var(--green)}
+  .bottom-nav a[aria-current="page"]::before{background:var(--green)}
   .bottom-nav a[aria-current="page"] .lbl{color:var(--text)}
-  .toast{right:14px;left:14px;bottom:84px;max-width:none}
+  .bottom-nav a:active{background:var(--panel-2)}
+  .toast{right:14px;left:14px;bottom:calc(76px + env(safe-area-inset-bottom));max-width:none}
+  /* iOS zooms the page when focusing a field under 16px */
+  .input,.mission-select,.qty input,select,input,textarea{font-size:16px}
+  .input.sm{height:36px}
+}
+@media (max-width:360px){
+  .bottom-nav .lbl{font-size:9.5px}
+  .bottom-nav svg{width:20px;height:20px}
 }
 @media (max-width:560px){
   .section-label .aside{display:none}
@@ -692,12 +708,12 @@ dialog::backdrop{background:rgba(4,7,10,.74)}
 </div>
 
 <nav class="bottom-nav" id="bottom-nav" aria-label="Primary mobile">
-  <a href="#dash" data-route="dash"><span class="lbl">Dashboard</span></a>
-  <a href="#carnet" data-route="carnet"><span class="lbl">Carnets</span></a>
-  <a href="#packing" data-route="packing"><span class="lbl">Pelicans</span></a>
-  <a href="#mission" data-route="mission"><span class="lbl">Projects</span></a>
-  <a href="#report" data-route="report"><span class="lbl">Reports</span></a>
-  <a href="#system" data-route="system"><span class="lbl">Settings</span></a>
+  <a href="#dash" data-route="dash"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg><span class="lbl">Dashboard</span></a>
+  <a href="#carnet" data-route="carnet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h6"/></svg><span class="lbl">Carnets</span></a>
+  <a href="#packing" data-route="packing"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13"/><path d="M9 7V4h6v3"/><path d="M3 12h18"/></svg><span class="lbl">Pelicans</span></a>
+  <a href="#mission" data-route="mission"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><span class="lbl">Projects</span></a>
+  <a href="#report" data-route="report"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="lbl">Reports</span></a>
+  <a href="#system" data-route="system"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span class="lbl">Settings</span></a>
 </nav>
 
 <!-- ================= DIALOGS ================= -->
