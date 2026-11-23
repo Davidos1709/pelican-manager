@@ -2325,6 +2325,21 @@ function initCloud() {
 /* ==========================================================================
    BOOT
    ========================================================================== */
+// Hosting providers may inject a floating badge over the bottom navigation
+function hideHostBadges() {
+  const isBadge = el => {
+    if (!(el instanceof HTMLElement) || el.closest('.app, .bottom-nav, dialog, #toast, #print-sheet, #mesh')) return false;
+    const text = `${el.id} ${el.className} ${el.getAttribute('src') || ''} ${el.textContent || ''} ${el.shadowRoot?.textContent || ''}`;
+    return /netlify/i.test(text);
+  };
+  const sweep = () => [...document.body.children, ...document.documentElement.children].forEach(el => {
+    if (isBadge(el)) el.style.setProperty('display', 'none', 'important');
+  });
+  sweep();
+  const obs = new MutationObserver(sweep);
+  obs.observe(document.body, { childList: true });
+  obs.observe(document.documentElement, { childList: true });
+}
 buildMesh();
 tickClock();
 setInterval(tickClock, 1000);
@@ -2333,6 +2348,7 @@ persist();
 renderChrome();
 showRoute();
 initCloud();
+hideHostBadges();
 if (bootNotice) toast(bootNotice);
 })();
 </script>
