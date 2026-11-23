@@ -86,6 +86,15 @@ h1,h2,h3{margin:0;font-weight:600}
 .mission-select{appearance:none;max-width:260px;padding:0 20px 0 0;border:0;background:transparent var(--caret) no-repeat right center;font:600 13px/1.2 var(--sans);color:var(--text);cursor:pointer;text-overflow:ellipsis}
 .mission-select option,.mission-select optgroup{background:var(--panel);color:var(--text)}
 .sys{flex-direction:row;align-items:center;gap:10px;font:600 11px/1 var(--mono);letter-spacing:.16em;color:var(--green);padding-right:24px;white-space:nowrap}
+button.sys{border:0;border-left:1px solid var(--border);background:transparent;cursor:pointer;transition:background .15s}
+button.sys:hover{background:var(--panel-2)}
+.sys.warn{color:var(--amber)}
+.sys.warn .pulse{background:var(--amber);animation:none}
+.sys.err{color:var(--red)}
+.sys.err .pulse{background:var(--red);animation:none}
+.account-grid{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+.account-grid .who{flex:1 1 260px;font:12px/1.6 var(--mono);color:var(--muted)}
+.account-grid .who b{color:var(--text);font-weight:600}
 .pulse{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 2.4s ease-out infinite}
 
 .main{width:100%;max-width:1640px;padding:24px 24px 56px}
@@ -477,7 +486,7 @@ dialog::backdrop{background:rgba(4,7,10,.74)}
           <span class="k" id="clock-date">—</span>
           <span class="v" id="clock-z">--:--:--</span>
         </div>
-        <div class="top-cell sys" role="status">SYSTEM ONLINE <span class="pulse" aria-hidden="true"></span></div>
+        <button class="top-cell sys" id="sys-status" type="button" data-act="open-account" role="status"><span id="sys-text">CONNECTING</span> <span class="pulse" aria-hidden="true"></span></button>
       </div>
     </header>
 
@@ -631,6 +640,10 @@ dialog::backdrop{background:rgba(4,7,10,.74)}
       <section class="view" data-view="system" hidden>
         <div class="section-label"><span class="idx">SYS</span>SYSTEM CONFIGURATION<span class="rule"></span></div>
         <div class="settings-grid">
+          <article class="panel span2">
+            <header class="panel-head"><span class="panel-code">CFG-00</span><h2 class="panel-title">Account &amp; Live Sync</h2><span class="panel-meta" id="account-meta"></span></header>
+            <div class="panel-body" id="account-body"></div>
+          </article>
           <article class="panel">
             <header class="panel-head"><span class="panel-code">CFG-01</span><h2 class="panel-title">Operator Profile</h2></header>
             <div class="panel-body form-grid">
@@ -752,6 +765,21 @@ dialog::backdrop{background:rgba(4,7,10,.74)}
     </div>
     <div class="dlg-foot"><button class="btn" type="button" data-close="manual-dialog">CANCEL</button><button class="btn btn-primary" type="submit">ADD TO PELICAN</button></div>
   </form>
+</dialog>
+
+<dialog id="auth-dialog" aria-labelledby="auth-title">
+  <div class="dlg-head"><span class="panel-code">AUTH</span><h2 id="auth-title">Operator Sign-In</h2></div>
+  <div class="dlg-body" style="display:grid;gap:16px">
+    <p class="dlg-msg">Sign in to access the shared mission database. Changes sync live across all devices.</p>
+    <div class="field"><label for="auth-email">EMAIL</label><input class="input mono" id="auth-email" type="email" autocomplete="username" inputmode="email" placeholder="name@company"></div>
+    <div class="field"><label for="auth-password">PASSWORD</label><input class="input mono" id="auth-password" type="password" autocomplete="current-password"></div>
+    <button class="link" type="button" data-act="auth-send" id="auth-send" style="justify-self:start">EMAIL ME A LOGIN LINK INSTEAD</button>
+    <p class="dlg-msg" id="auth-sent" hidden></p>
+  </div>
+  <div class="dlg-foot">
+    <button class="btn" type="button" data-act="auth-offline">WORK OFFLINE</button>
+    <button class="btn btn-primary" type="button" data-act="auth-password" id="auth-login">SIGN IN</button>
+  </div>
 </dialog>
 
 <dialog id="confirm-dialog" aria-labelledby="confirm-title">
@@ -931,9 +959,13 @@ function loadState() {
 
 let state = loadState();
 
-function persist() {
+function persistLocal() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
   catch { toast('STORAGE WRITE FAILED · CHECK BROWSER SETTINGS', 'warn'); }
+}
+function persist() {
+  persistLocal();
+  queuePush();
 }
 
 /* ==========================================================================
@@ -1636,6 +1668,7 @@ function renderReports() {
    VIEW · SETTINGS
    ========================================================================== */
 function renderSystem() {
+  renderAccount();
   $$('[data-setting]').forEach(inp => { if (document.activeElement !== inp) inp.value = state.settings[inp.dataset.setting] || ''; });
   renderPnTable();
   renderRegistry();
@@ -1826,9 +1859,47 @@ const ACTIONS = {
   'backup-export': () => download(new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }), `pelican-ops-backup-${todayIso()}.json`),
   'backup-import': () => $('#backup-file').click(),
   'factory-reset': async () => {
+    if (cloud.live) {
+      if (!await confirmBox('Clear this device\'s local cache and re-download the shared database? Shared data is not affected.', { title: 'Reset Local Cache', ok: 'RESET CACHE' })) return;
+      state = blankState(); state.equipment = [];
+      cloud.synced = new Map(); saveSyncMeta(); persistLocal();
+      await pullAndReconcile(); renderChrome(); renderRoute(); toast('LOCAL CACHE RELOADED FROM SHARED DATABASE');
+      return;
+    }
     if (!await confirmBox('Erase all missions, carnets, Pelicans and settings on this workstation and restore the baseline registry? Export a backup first.', { title: 'Factory Reset', ok: 'ERASE ALL DATA', danger: true })) return;
     state = blankState(); state.equipment = baselineEquipment(); commit(); toast('SYSTEM RESET COMPLETE', 'warn');
-  }
+  },
+  'open-account': () => { if (cloud.live) location.hash = '#system'; else openAuth(); },
+  'auth-offline': () => { sessionStorage.setItem('pops-offline', '1'); $('#auth-dialog').close(); setSync(cloud.user ? cloud.status : 'local'); },
+  'auth-password': async () => {
+    const email = $('#auth-email').value.trim().toLowerCase();
+    const password = $('#auth-password').value;
+    if (!/^\S+@\S+\.\S+$/.test(email) || !password) { toast('ENTER EMAIL AND PASSWORD', 'warn'); return; }
+    if (!cloud.client) { toast('CLOUD SERVICE UNREACHABLE · CHECK CONNECTION', 'warn'); return; }
+    const btn = $('#auth-login'); btn.disabled = true;
+    const { error } = await cloud.client.auth.signInWithPassword({ email, password });
+    btn.disabled = false;
+    if (error) { toast(error.message === 'Invalid login credentials' ? 'WRONG EMAIL OR PASSWORD' : `SIGN-IN FAILED · ${error.message.toUpperCase()}`, 'warn'); return; }
+    $('#auth-password').value = '';
+    $('#auth-dialog').close();
+  },
+  'auth-send': async () => {
+    const email = $('#auth-email').value.trim().toLowerCase();
+    if (!/^\S+@\S+\.\S+$/.test(email)) { toast('ENTER A VALID EMAIL', 'warn'); $('#auth-email').focus(); return; }
+    if (!cloud.client) { toast('CLOUD SERVICE UNREACHABLE · CHECK CONNECTION', 'warn'); return; }
+    const btn = $('#auth-send'); btn.disabled = true;
+    const { error } = await cloud.client.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + location.pathname, shouldCreateUser: false } });
+    btn.disabled = false;
+    if (error) { toast(`LOGIN LINK FAILED · ${error.message.toUpperCase()}`, 'warn'); return; }
+    $('#auth-sent').textContent = `Login link sent to ${email}. Open the email on this device and tap the link.`;
+    $('#auth-sent').hidden = false;
+  },
+  'sign-out': async () => {
+    if (!cloud.client) return;
+    if (!await confirmBox('Sign out of the shared database on this device? Data stays cached locally.', { title: 'Sign Out', ok: 'SIGN OUT' })) return;
+    await cloud.client.auth.signOut();
+  },
+  'sync-now': () => pullAndReconcile()
 };
 
 document.addEventListener('click', e => {
@@ -1876,6 +1947,10 @@ document.addEventListener('change', e => {
   if (t.id === 'mission-filter') { renderMissions(); return; }
 });
 
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.target.id === 'auth-password' || e.target.id === 'auth-email')) { e.preventDefault(); ACTIONS['auth-password'](); }
+});
+
 document.addEventListener('input', e => {
   const t = e.target;
   if (t.id === 'carnet-search') renderCarnetGroups();
@@ -1905,8 +1980,10 @@ $('#mission-form').addEventListener('submit', e => {
   const existing = id && missionById(id);
   if (existing) { Object.assign(existing, data); touch(existing); }
   else {
-    state.seq += 1;
-    const m = cleanMission({ ...data, code: `MSN-${pad(state.seq, 4)}`, pelicans: [] });
+    // Derive from existing codes so devices creating missions concurrently stay in sequence
+    const next = Math.max(state.seq, 0, ...state.missions.map(x => Number((x.code.match(/(\d+)$/) || [])[1]) || 0)) + 1;
+    state.seq = next;
+    const m = cleanMission({ ...data, code: `MSN-${pad(next, 4)}`, pelicans: [] });
     state.missions.push(m);
     state.activeMissionId = m.id;
   }
@@ -1972,11 +2049,258 @@ $('#backup-file').addEventListener('change', async e => {
     if (!raw || typeof raw !== 'object') throw new Error('invalid');
     const next = raw.version === 2 ? normalizeState(raw) : (raw.trip || raw.pelicans || raw.savedTrips) ? migrateLegacy(raw) : null;
     if (!next) throw new Error('invalid');
-    if (!await confirmBox(`Restore backup with ${next.missions.length} missions, ${next.carnets.length} carnets and ${next.equipment.length} registry units? Current data will be replaced.`, { title: 'Import Backup', ok: 'RESTORE', danger: true })) return;
+    if (!await confirmBox(`Restore backup with ${next.missions.length} missions, ${next.carnets.length} carnets and ${next.equipment.length} registry units? Current data will be replaced${cloud.live ? ' for ALL signed-in users' : ''}.`, { title: 'Import Backup', ok: 'RESTORE', danger: true })) return;
     state = next; commit(); toast('BACKUP RESTORED');
   } catch { toast('INVALID BACKUP FILE · NO CHANGES MADE', 'warn'); }
   finally { e.target.value = ''; }
 });
+
+/* ==========================================================================
+   CLOUD SYNC · Supabase (email login, row-per-document, realtime)
+   ========================================================================== */
+const SUPABASE_URL = 'https://sqjbnwajykublszjmwfw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_UFPsrVsjjd0gWv6kQVWsLA_5a7UaaFV';
+const SUPABASE_CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+const SYNC_KEY = 'pelican-ops-sync';
+const TABLE = 'ops_docs';
+const cloud = { client: null, user: null, live: false, status: 'local', detail: '', synced: new Map(), channel: null, timer: null, pushing: false, again: false, authEmail: '', lastNotice: 0 };
+
+// Key-sorted serialization: Postgres jsonb reorders keys, so plain JSON.stringify can't detect echoes
+function canon(v) {
+  if (Array.isArray(v)) return `[${v.map(canon).join(',')}]`;
+  if (v && typeof v === 'object') return `{${Object.keys(v).filter(k => v[k] !== undefined).sort().map(k => `${JSON.stringify(k)}:${canon(v[k])}`).join(',')}}`;
+  return JSON.stringify(v === undefined ? null : v);
+}
+// activeMissionId and operator stay per-device; everything else is shared
+function stateToDocs(s) {
+  const docs = new Map();
+  docs.set('settings', { kind: 'settings', data: { emailTo: s.settings.emailTo, emailCc: s.settings.emailCc, pnMap: s.settings.pnMap } });
+  docs.set('equipment', { kind: 'equipment', data: s.equipment });
+  s.missions.forEach(m => docs.set(`mission:${m.id}`, { kind: 'mission', data: m }));
+  s.carnets.forEach(c => docs.set(`carnet:${c.id}`, { kind: 'carnet', data: c }));
+  Object.entries(s.drafts).forEach(([mid, d]) => docs.set(`draft:${mid}`, { kind: 'draft', data: { missionId: mid, carnetId: d.carnetId, units: d.units } }));
+  return docs;
+}
+const canonLocal = id => { const d = stateToDocs(state).get(id); return d ? canon(d.data) : undefined; };
+
+function applyRemote(kind, data) {
+  if (!data || typeof data !== 'object') return;
+  const upsert = (list, item) => { const i = list.findIndex(x => x.id === item.id); if (i >= 0) list[i] = item; else list.push(item); };
+  if (kind === 'settings') state.settings = { ...state.settings, emailTo: str(data.emailTo), emailCc: str(data.emailCc), pnMap: Array.isArray(data.pnMap) ? data.pnMap.filter(Boolean).map(x => ({ name: str(x.name), pn: str(x.pn) })) : state.settings.pnMap };
+  else if (kind === 'equipment' && Array.isArray(data)) state.equipment = data.filter(e => e && str(e.name).trim()).map(cleanEquipment);
+  else if (kind === 'mission') upsert(state.missions, cleanMission(data));
+  else if (kind === 'carnet') upsert(state.carnets, cleanCarnet(data));
+  else if (kind === 'draft' && data.missionId) state.drafts[data.missionId] = { carnetId: data.carnetId || null, units: Array.isArray(data.units) ? data.units.map(String) : [] };
+}
+function removeLocal(id) {
+  const sep = id.indexOf(':');
+  const kind = id.slice(0, sep), key = id.slice(sep + 1);
+  if (kind === 'mission') { state.missions = state.missions.filter(m => m.id !== key); if (state.activeMissionId === key) state.activeMissionId = null; }
+  else if (kind === 'carnet') state.carnets = state.carnets.filter(c => c.id !== key);
+  else if (kind === 'draft') delete state.drafts[key];
+}
+
+function loadSyncMeta() {
+  cloud.synced = new Map();
+  try {
+    const meta = JSON.parse(localStorage.getItem(SYNC_KEY) || 'null');
+    if (meta && meta.userId === cloud.user?.id && meta.synced) cloud.synced = new Map(Object.entries(meta.synced));
+  } catch { /* fresh baseline */ }
+}
+function saveSyncMeta() {
+  try { localStorage.setItem(SYNC_KEY, JSON.stringify({ userId: cloud.user?.id || null, synced: Object.fromEntries(cloud.synced) })); } catch { /* cache only */ }
+}
+
+const SYNC_LABEL = { live: 'SYSTEM ONLINE', connecting: 'CONNECTING', local: 'LOCAL MODE', error: 'SYNC ERROR', denied: 'ACCESS DENIED', setup: 'DB NOT READY' };
+function setSync(status, detail = '') {
+  cloud.status = status; cloud.detail = detail;
+  const el = $('#sys-status');
+  $('#sys-text').textContent = SYNC_LABEL[status] || status;
+  el.classList.toggle('warn', status === 'local' || status === 'connecting');
+  el.classList.toggle('err', status === 'error' || status === 'denied' || status === 'setup');
+  el.title = status === 'live' ? `LIVE SYNC · ${cloud.user?.email || ''}` : (detail || SYNC_LABEL[status] || '');
+  if (currentRoute() === 'system') renderAccount();
+}
+function renderAccount() {
+  const s = cloud.status;
+  const tone = s === 'live' ? 'ok' : (s === 'local' || s === 'connecting') ? 'warn' : 'danger';
+  $('#account-meta').innerHTML = `<span class="badge ${tone}">${esc(SYNC_LABEL[s] || s)}</span>`;
+  const detail = {
+    live: 'Changes are shared in real time with every signed-in device.',
+    connecting: 'Connecting to the shared database…',
+    local: 'Not signed in. Data is stored on this device only and is not shared.',
+    error: `Sync problem: ${cloud.detail || 'unknown error'}. Local changes are kept and will upload when the connection returns.`,
+    denied: `${cloud.user?.email || 'This account'} is not on the operator allowlist. Ask the administrator to add it to ops_members.`,
+    setup: 'The shared database tables are missing. Run supabase-setup.sql in the Supabase SQL editor.'
+  }[s] || '';
+  $('#account-body').innerHTML = `<div class="account-grid">
+    <div class="who">${cloud.user ? `SIGNED IN AS <b>${esc(cloud.user.email)}</b><br>` : ''}${esc(detail)}</div>
+    <div class="data-actions">${cloud.user
+      ? `<button class="btn" type="button" data-act="sync-now">SYNC NOW</button><button class="btn" type="button" data-act="sign-out">SIGN OUT</button>`
+      : '<button class="btn btn-primary" type="button" data-act="open-account">SIGN IN</button>'}</div>
+  </div>`;
+}
+function openAuth() {
+  const d = $('#auth-dialog');
+  if (d.open) return;
+  $('#auth-sent').hidden = true;
+  $('#auth-send').disabled = false; $('#auth-login').disabled = false;
+  $('#auth-password').value = '';
+  d.showModal();
+  $('#auth-email').focus();
+}
+
+function queuePush() {
+  if (!cloud.live) return;
+  clearTimeout(cloud.timer);
+  cloud.timer = setTimeout(pushNow, 350);
+}
+async function pushNow() {
+  if (!cloud.live) return;
+  clearTimeout(cloud.timer);
+  if (cloud.pushing) { cloud.again = true; return; }
+  cloud.pushing = true;
+  try {
+    const docs = stateToDocs(state);
+    const now = nowIso();
+    const up = [];
+    docs.forEach((d, id) => {
+      const j = canon(d.data);
+      if (cloud.synced.get(id) !== j) up.push({ row: { id, kind: d.kind, data: JSON.parse(JSON.stringify(d.data)), updated_by: cloud.user.email, updated_at: now }, j });
+    });
+    const del = [...cloud.synced.keys()].filter(id => !docs.has(id));
+    if (up.length) {
+      const { error } = await cloud.client.from(TABLE).upsert(up.map(u => u.row));
+      if (error) throw error;
+      up.forEach(u => cloud.synced.set(u.row.id, u.j));
+    }
+    if (del.length) {
+      const { error } = await cloud.client.from(TABLE).delete().in('id', del);
+      if (error) throw error;
+      del.forEach(id => cloud.synced.delete(id));
+    }
+    saveSyncMeta();
+    if (cloud.status !== 'live') setSync('live');
+  } catch (e) {
+    if (e && e.code === '42501') { cloud.live = false; setSync('denied'); }
+    else { setSync('error', e?.message || 'UPLOAD FAILED'); setTimeout(queuePush, 5000); }
+  } finally {
+    cloud.pushing = false;
+    if (cloud.again) { cloud.again = false; queuePush(); }
+  }
+}
+
+async function reconcile(rows) {
+  const fresh = cloud.synced.size === 0;
+  const remote = new Map(rows.map(r => [r.id, r]));
+  const local = stateToDocs(state);
+  const base = cloud.synced;
+  let changed = false;
+  remote.forEach((r, id) => {
+    const rj = canon(r.data);
+    const lj = local.has(id) ? canon(local.get(id).data) : undefined;
+    if (lj === rj) { base.set(id, rj); return; }
+    // Remote wins unless this device edited the doc since the last sync
+    if (fresh || lj === base.get(id)) { applyRemote(r.kind, r.data); base.set(id, canonLocal(id) ?? rj); changed = true; }
+  });
+  const orphans = [...local.keys()].filter(id => !remote.has(id));
+  orphans.forEach(id => {
+    if (!base.has(id)) return;
+    if (canon(local.get(id).data) === base.get(id)) { removeLocal(id); changed = true; }
+    base.delete(id);
+  });
+  if (fresh && rows.length) {
+    const localOnly = orphans.filter(id => /^(mission|carnet|draft):/.test(id) && stateToDocs(state).has(id));
+    const missions = localOnly.filter(id => id.startsWith('mission:'));
+    if (missions.length && !await confirmBox(`This device has ${missions.length} local mission(s) that are not in the shared database. Upload them for all users? Choose Cancel to discard them from this device.`, { title: 'Merge Local Data', ok: 'UPLOAD' })) {
+      localOnly.forEach(removeLocal); changed = true;
+    }
+  }
+  if (changed) { persistLocal(); renderChrome(); renderRoute(); }
+  saveSyncMeta();
+}
+async function pullAndReconcile() {
+  if (!cloud.client || !cloud.user || cloud.status === 'denied' || cloud.status === 'setup') return;
+  try {
+    const { data, error } = await cloud.client.from(TABLE).select('id,kind,data');
+    if (error) throw error;
+    await reconcile(data || []);
+    cloud.live = true;
+    setSync('live');
+    await pushNow();
+  } catch (e) {
+    setSync('error', e?.message || 'DOWNLOAD FAILED');
+  }
+}
+function onRemote(p) {
+  const row = p.new && p.new.id ? p.new : null;
+  const id = row ? row.id : p.old?.id;
+  if (!id) return;
+  if (p.eventType === 'DELETE') {
+    if (!cloud.synced.has(id)) return;
+    removeLocal(id); cloud.synced.delete(id);
+  } else {
+    const rj = canon(row.data);
+    if (cloud.synced.get(id) === rj) return;
+    applyRemote(row.kind, row.data);
+    cloud.synced.set(id, canonLocal(id) ?? rj);
+    if (row.updated_by && row.updated_by !== cloud.user?.email && Date.now() - cloud.lastNotice > 4000) {
+      cloud.lastNotice = Date.now();
+      toast(`LIVE UPDATE · ${row.updated_by.split('@')[0].toUpperCase()}`);
+    }
+  }
+  saveSyncMeta(); persistLocal(); renderChrome(); renderRoute();
+}
+function subscribe() {
+  if (cloud.channel) cloud.client.removeChannel(cloud.channel);
+  let first = true;
+  cloud.channel = cloud.client.channel('ops-docs')
+    .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, onRemote)
+    .subscribe(status => {
+      // Re-pull after every (re)subscribe to catch changes missed while disconnected
+      if (status === 'SUBSCRIBED') { if (!first) pullAndReconcile(); first = false; }
+      else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') { if (cloud.live) setSync('error', 'REALTIME CONNECTION LOST · RETRYING'); }
+    });
+}
+async function startSync() {
+  if ($('#auth-dialog').open) $('#auth-dialog').close();
+  setSync('connecting');
+  loadSyncMeta();
+  const { data, error } = await cloud.client.from('ops_members').select('email').limit(1);
+  if (error) { setSync(error.code === 'PGRST205' || error.code === '42P01' ? 'setup' : 'error', error.message); return; }
+  if (!data || !data.length) { setSync('denied'); return; }
+  await pullAndReconcile();
+  if (cloud.live) { subscribe(); toast(`LIVE SYNC ACTIVE · ${cloud.user.email.toUpperCase()}`); }
+}
+function stopSync() {
+  cloud.live = false;
+  clearTimeout(cloud.timer);
+  if (cloud.channel) { cloud.client.removeChannel(cloud.channel); cloud.channel = null; }
+  cloud.synced = new Map();
+  setSync('local');
+}
+function initCloud() {
+  setSync('connecting');
+  const s = document.createElement('script');
+  s.src = SUPABASE_CDN;
+  s.async = true;
+  s.onerror = () => setSync('local', 'CLOUD SERVICE UNREACHABLE');
+  s.onload = () => {
+    try {
+      cloud.client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+    } catch (e) { setSync('local', e.message); return; }
+    cloud.client.auth.onAuthStateChange((event, session) => {
+      const u = session?.user || null;
+      // Supabase warns against awaiting its own calls inside this callback
+      if (u && cloud.user?.id !== u.id) { cloud.user = u; setTimeout(startSync, 0); }
+      else if (!u && cloud.user) { cloud.user = null; stopSync(); }
+      else if (!u && event === 'INITIAL_SESSION') { setSync('local'); if (!sessionStorage.getItem('pops-offline')) openAuth(); }
+    });
+  };
+  document.head.appendChild(s);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && cloud.live) pullAndReconcile(); });
+  window.addEventListener('online', () => { if (cloud.user) pullAndReconcile(); });
+}
 
 /* ==========================================================================
    BOOT
@@ -1988,6 +2312,7 @@ window.addEventListener('hashchange', showRoute);
 persist();
 renderChrome();
 showRoute();
+initCloud();
 if (bootNotice) toast(bootNotice);
 })();
 </script>
