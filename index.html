@@ -1869,7 +1869,7 @@ const ACTIONS = {
     if (!await confirmBox('Erase all missions, carnets, Pelicans and settings on this workstation and restore the baseline registry? Export a backup first.', { title: 'Factory Reset', ok: 'ERASE ALL DATA', danger: true })) return;
     state = blankState(); state.equipment = baselineEquipment(); commit(); toast('SYSTEM RESET COMPLETE', 'warn');
   },
-  'open-account': () => { if (cloud.live) location.hash = '#system'; else openAuth(); },
+  'open-account': () => { if (cloud.user) location.hash = '#system'; else openAuth(); },
   'auth-offline': () => { sessionStorage.setItem('pops-offline', '1'); $('#auth-dialog').close(); setSync(cloud.user ? cloud.status : 'local'); },
   'auth-password': async () => {
     const email = $('#auth-email').value.trim().toLowerCase();
@@ -1899,7 +1899,7 @@ const ACTIONS = {
     if (!await confirmBox('Sign out of the shared database on this device? Data stays cached locally.', { title: 'Sign Out', ok: 'SIGN OUT' })) return;
     await cloud.client.auth.signOut();
   },
-  'sync-now': () => pullAndReconcile()
+  'sync-now': () => (cloud.live ? pullAndReconcile() : startSync())
 };
 
 document.addEventListener('click', e => {
@@ -2267,7 +2267,11 @@ async function startSync() {
   setSync('connecting');
   loadSyncMeta();
   const { data, error } = await cloud.client.from('ops_members').select('email').limit(1);
-  if (error) { setSync(error.code === 'PGRST205' || error.code === '42P01' ? 'setup' : 'error', error.message); return; }
+  if (error) {
+    const missing = error.code === 'PGRST205' || error.code === '42P01';
+    setSync(missing ? 'setup' : 'error', error.code === '42501' ? 'DATABASE PERMISSIONS MISSING · RE-RUN supabase-setup.sql' : error.message);
+    return;
+  }
   if (!data || !data.length) { setSync('denied'); return; }
   await pullAndReconcile();
   if (cloud.live) { subscribe(); toast(`LIVE SYNC ACTIVE · ${cloud.user.email.toUpperCase()}`); }

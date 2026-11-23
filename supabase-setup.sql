@@ -40,6 +40,13 @@ drop policy if exists "ops member sees self" on public.ops_members;
 create policy "ops member sees self" on public.ops_members for select to authenticated
   using (lower(email) = lower(auth.jwt() ->> 'email'));
 
+-- Table privileges (newer projects do not auto-grant tables created in the SQL editor)
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.ops_docs to authenticated;
+grant select on public.ops_members to authenticated;
+grant execute on function public.is_ops_member() to authenticated;
+revoke all on public.ops_docs, public.ops_members from anon;
+
 -- Live updates
 do $$
 begin
@@ -53,5 +60,6 @@ end $$;
 
 -- Authorized operators — add one line per team member (lowercase)
 insert into public.ops_members (email) values
-  ('davids5@rafael.co.il')
+  ('davids5@rafael.co.il'),
+  ('yahavvak@rafael.co.il')
 on conflict do nothing;
